@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ff3366">
-    <title>Falcon Pro | Secure Notes</title>
+    <title>Falcon Pro | সুরক্ষিত নোট</title>
     
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -22,284 +22,315 @@
             --text-main: #2d3436;
             --text-muted: #636e72;
             --border: #e2e8f0;
-            --radius: 12px;
-            --font-sans: 'Inter', system-ui, sans-serif;
+            --radius: 16px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
+            --font-sans: 'Hind Siliguri', 'Inter', system-ui, -apple-system, sans-serif;
+            --sidebar-width: 260px;
+            --sidebar-collapsed-width: 80px;
         }
 
         [data-theme="dark"] {
-            --bg-body: #0f1115;
-            --bg-sidebar: #16181d;
-            --bg-card: #16181d;
+            --bg-body: #121212;
+            --bg-sidebar: #1e1e1e;
+            --bg-card: #1e1e1e;
             --text-main: #e2e8f0;
-            --text-muted: #94a3b8;
-            --border: #2d3748;
+            --text-muted: #a0aec0;
+            --border: #333;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
         }
 
         /* --- GLOBAL RESET --- */
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { font-family: var(--font-sans); background-color: var(--bg-body); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; transition: background 0.3s; }
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
         
-        /* --- LAYOUT --- */
-        #sidebar { width: 260px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 1.5rem; transition: transform 0.3s; z-index: 20; }
-        #main { flex: 1; display: flex; flex-direction: column; height: 100%; position: relative; }
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        body { font-family: var(--font-sans); background-color: var(--bg-body); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; transition: background 0.3s, color 0.3s; }
+        
+        /* --- SIDEBAR IMPROVED --- */
+        #sidebar { 
+            width: var(--sidebar-width); 
+            background: var(--bg-sidebar); 
+            border-right: 1px solid var(--border); 
+            display: flex; 
+            flex-direction: column; 
+            padding: 1.5rem; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            z-index: 50; 
+            position: relative;
+            height: 100%;
+        }
+
+        /* Collapsed State (Desktop) */
+        body.sidebar-collapsed #sidebar { width: var(--sidebar-collapsed-width); padding: 1.5rem 1rem; }
+        body.sidebar-collapsed .logo-text,
+        body.sidebar-collapsed .nav-header,
+        body.sidebar-collapsed .nav-text,
+        body.sidebar-collapsed .badge,
+        body.sidebar-collapsed .user-info-text,
+        body.sidebar-collapsed #mode-text { display: none; opacity: 0; }
+        
+        body.sidebar-collapsed .nav-item { justify-content: center; padding: 12px 0; }
+        body.sidebar-collapsed .logo { justify-content: center; }
+        body.sidebar-collapsed .user-card { justify-content: center; padding: 0; background: transparent; border: none; }
+        body.sidebar-collapsed #mode-badge { justify-content: center; padding: 10px; }
+
+        #main { flex: 1; display: flex; flex-direction: column; height: 100%; position: relative; transition: margin 0.3s; }
         
         /* --- COMPONENTS --- */
-        .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-bottom: 2rem; display: flex; align-items: center; gap: 10px; }
-        .logo img { height: 40px; width: auto; object-fit: contain; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin-bottom: 2rem; display: flex; align-items: center; gap: 10px; overflow: hidden; white-space: nowrap; }
+        .logo img { height: 36px; width: auto; object-fit: contain; }
+        .logo-pro { background: var(--primary); color: white; padding: 2px 6px; border-radius: 6px; font-size: 0.8rem; margin-left: 5px; vertical-align: middle; display: inline-block; }
         
-        .nav-group { margin-bottom: 1.5rem; }
-        .nav-header { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 0.5rem; padding-left: 0.5rem; }
-        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; color: var(--text-muted); cursor: pointer; transition: 0.2s; font-size: 0.95rem; font-weight: 500; }
-        .nav-item:hover, .nav-item.active { background: rgba(var(--primary-rgb), 0.08); color: var(--primary); }
+        .nav-group { margin-bottom: 2rem; }
+        .nav-header { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 0.8rem; padding-left: 0.8rem; white-space: nowrap; }
         
-        .badge { background: var(--primary); color: white; padding: 2px 6px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; margin-left: auto; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; color: var(--text-muted); cursor: pointer; transition: all 0.2s; font-size: 1rem; font-weight: 500; user-select: none; }
+        .nav-item:hover { background: rgba(var(--primary-rgb), 0.05); color: var(--primary); transform: translateX(3px); }
+        .nav-item.active { background: rgba(var(--primary-rgb), 0.1); color: var(--primary); font-weight: 600; }
+        .nav-item i { font-size: 1.2rem; min-width: 24px; text-align: center; }
+        
+        .badge { background: var(--primary); color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; margin-left: auto; letter-spacing: 0.5px; }
+
+        /* Modern Mode Badge */
+        #mode-badge {
+            margin-bottom: 1.5rem; 
+            cursor: default; 
+            border-radius: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            transition: all 0.3s ease;
+        }
+        #mode-badge.local {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffecb3 100%);
+            color: #d35400;
+            border: 1px solid #ffeeba;
+        }
+        #mode-badge.cloud {
+            background: linear-gradient(135deg, #d1f2eb 0%, #a3e4d7 100%);
+            color: #0e6655;
+            border: 1px solid #a2d9ce;
+            box-shadow: 0 4px 12px rgba(14, 102, 85, 0.15);
+        }
 
         /* User Card */
-        .user-card { background: rgba(var(--primary-rgb), 0.05); padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
-        .user-info { display: flex; flex-direction: column; overflow: hidden; }
-        .user-name { font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .user-status { font-size: 0.7rem; color: var(--primary); font-weight: 600; }
+        .user-card { background: var(--bg-body); padding: 10px; border-radius: 12px; display: flex; align-items: center; gap: 12px; margin-bottom: 10px; border: 1px solid var(--border); transition: 0.3s; }
+        .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; flex-shrink: 0; }
+        .user-info-text { display: flex; flex-direction: column; overflow: hidden; }
+        .user-name { font-size: 0.95rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-status { font-size: 0.8rem; color: var(--primary); font-weight: 600; }
 
         /* Top Bar & Search */
-        .top-bar { padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
-        .search-container { position: relative; flex: 1; max-width: 500px; margin-left: 1rem; }
-        .search-input { width: 100%; padding: 10px 10px 10px 40px; border-radius: 24px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-main); }
-        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .top-bar { padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: var(--bg-body); z-index: 10; }
+        .search-container { position: relative; flex: 1; max-width: 600px; }
+        .search-input { width: 100%; padding: 12px 12px 12px 48px; border-radius: 50px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-main); transition: 0.3s; box-shadow: var(--shadow-sm); font-family: var(--font-sans); }
+        .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1); }
+        .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.1rem; }
         
+        .sidebar-toggle-btn { padding: 8px; border-radius: 8px; cursor: pointer; color: var(--text-muted); background: transparent; border: none; font-size: 1.4rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .sidebar-toggle-btn:hover { background: rgba(0,0,0,0.05); color: var(--text-main); }
+
         /* Note Grid */
-        #content-area { flex: 1; overflow-y: auto; padding: 1.5rem 2rem 5rem; }
-        .grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+        #content-area { flex: 1; overflow-y: auto; padding: 0.5rem 2rem 5rem; }
+        .grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
         
-        .note-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; transition: 0.2s; cursor: pointer; display: flex; flex-direction: column; gap: 0.75rem; max-height: 350px; overflow: hidden; position: relative; }
-        .note-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-color: rgba(var(--primary-rgb), 0.3); }
-        .note-title { font-weight: 700; font-size: 1.1rem; }
-        .note-preview { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
-        .note-meta { display: flex; justify-content: space-between; align-items: center; margin-top: auto; font-size: 0.75rem; color: var(--text-muted); }
+        .note-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; transition: 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); cursor: pointer; display: flex; flex-direction: column; gap: 0.75rem; height: 280px; overflow: hidden; position: relative; box-shadow: var(--shadow-sm); }
+        .note-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: rgba(var(--primary-rgb), 0.4); }
+        .note-title { font-weight: 700; font-size: 1.2rem; line-height: 1.4; margin-bottom: 5px; }
+        .note-preview { font-size: 1rem; color: var(--text-muted); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
+        .note-meta { display: flex; justify-content: space-between; align-items: center; margin-top: auto; font-size: 0.8rem; color: var(--text-muted); font-weight: 500; padding-top: 10px; border-top: 1px dashed var(--border); }
         
-        /* Locked Note */
-        .note-card.locked .note-preview { filter: blur(5px); opacity: 0.5; pointer-events: none; }
-        .lock-badge { position: absolute; top: 10px; right: 10px; color: var(--text-muted); }
+        .note-card.locked .note-preview { filter: blur(6px); opacity: 0.6; pointer-events: none; user-select: none; }
+        .lock-badge { position: absolute; top: 15px; right: 15px; color: var(--primary); background: rgba(var(--primary-rgb), 0.1); padding: 5px; border-radius: 50%; }
 
-        /* --- AUTH MODAL IMPROVED --- */
-        .auth-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 999; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.3s; }
-        .auth-overlay.active { opacity: 1; pointer-events: auto; }
-        
-        .auth-box { background: var(--bg-card); width: 100%; max-width: 420px; padding: 2.5rem; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); position: relative; transform: translateY(20px); transition: 0.3s; }
-        .auth-overlay.active .auth-box { transform: translateY(0); }
-        
-        .auth-header { text-align: center; margin-bottom: 1.5rem; }
-        .auth-title { font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem; }
-        .auth-subtitle { color: var(--text-muted); font-size: 0.9rem; }
-        
-        .auth-tabs { display: flex; background: var(--border); padding: 4px; border-radius: 8px; margin-bottom: 1.5rem; }
-        .auth-tab { flex: 1; padding: 10px; text-align: center; cursor: pointer; border-radius: 6px; font-weight: 600; font-size: 0.95rem; color: var(--text-muted); transition: 0.2s; }
-        .auth-tab.active { background: var(--bg-card); color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        
-        .form-group { margin-bottom: 1.2rem; position: relative; }
-        .form-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-main); }
-        .form-input { width: 100%; padding: 12px 14px; padding-right: 40px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-main); transition: 0.2s; font-size: 0.95rem; }
-        .form-input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1); }
-        
-        /* Password Eye Icon */
-        .password-toggle { position: absolute; right: 12px; top: 38px; color: var(--text-muted); cursor: pointer; font-size: 1.2rem; transition: 0.2s; }
-        .password-toggle:hover { color: var(--primary); }
+        /* --- TOAST NOTIFICATION --- */
+        #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: #2d3436; color: white; padding: 12px 24px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 10px; animation: slideUp 0.3s ease forwards; pointer-events: auto; }
+        .toast.success { background: #00b894; }
+        .toast.error { background: #d63031; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .btn-primary { width: 100%; padding: 12px; border-radius: 8px; background: var(--primary); color: white; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 1rem; margin-top: 0.5rem; }
-        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
-        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
-
-        .auth-footer { margin-top: 1.5rem; text-align: center; font-size: 0.85rem; color: var(--text-muted); }
-        .auth-link { color: var(--primary); cursor: pointer; font-weight: 600; text-decoration: none; }
-        .auth-link:hover { text-decoration: underline; }
-
-        .close-auth { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); }
-
-        /* Error & Info Messages */
-        .error-msg { background: rgba(231, 76, 60, 0.1); color: #c0392b; font-size: 0.85rem; padding: 10px; border-radius: 6px; margin-bottom: 1rem; display: none; text-align: center; border: 1px solid rgba(231, 76, 60, 0.2); }
-        .info-msg { background: rgba(52, 152, 219, 0.1); color: #2980b9; font-size: 0.85rem; padding: 10px; border-radius: 6px; margin-bottom: 1rem; display: none; text-align: center; border: 1px solid rgba(52, 152, 219, 0.2); }
-
-        /* EDITOR STYLES */
+        /* --- EDITOR STYLES --- */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 100; display: none; opacity: 0; transition: opacity 0.2s; justify-content: center; align-items: center; }
         .modal-overlay.open { display: flex; opacity: 1; }
-        .modal-window { background: var(--bg-card); width: 90%; max-width: 1000px; height: 90vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; }
-        .toolbar { padding: 10px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: center; background: var(--bg-card); overflow-x: auto; }
-        .tool-btn { padding: 8px; border-radius: 6px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .tool-btn:hover { background: rgba(0,0,0,0.05); color: var(--text-main); }
-        .editor-content { flex: 1; overflow-y: auto; padding: 3rem; font-size: 1.1rem; line-height: 1.7; }
-        .editor-title { font-size: 2rem; font-weight: 800; border: none; width: 100%; margin-bottom: 1.5rem; background: transparent; color: var(--text-main); }
+        .modal-window { background: var(--bg-card); width: 95%; max-width: 1000px; height: 95vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; }
         
-        /* FAB */
-        .fab { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 10px 25px rgba(var(--primary-rgb), 0.4); cursor: pointer; border: none; transition: transform 0.2s; z-index: 50; }
-        .fab:hover { transform: scale(1.1); }
+        .toolbar { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: center; background: var(--bg-card); overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+        .tool-btn { padding: 10px; border-radius: 8px; border: 1px solid transparent; background: transparent; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: 0.2s; min-width: 40px; }
+        .tool-btn:hover, .tool-btn.active { background: rgba(0,0,0,0.05); color: var(--text-main); border-color: var(--border); }
+        .tool-divider { width: 1px; height: 24px; background: var(--border); margin: 0 5px; }
+        
+        .editor-content { flex: 1; overflow-y: auto; padding: 3rem; font-size: 1.2rem; line-height: 1.8; position: relative; }
+        .editor-title { font-size: 2.2rem; font-weight: 800; border: none; width: 100%; margin-bottom: 1.5rem; background: transparent; color: var(--text-main); padding: 0; font-family: var(--font-sans); }
+        #note-body:empty:before { content: attr(placeholder); color: var(--text-muted); opacity: 0.5; cursor: text; }
+        
+        .word-count { position: absolute; bottom: 20px; right: 20px; font-size: 0.8rem; color: var(--text-muted); background: var(--bg-body); padding: 5px 10px; border-radius: 20px; opacity: 0.8; }
 
-        /* Utilities */
-        .hidden { display: none !important; }
-        
+        /* FAB */
+        .fab { position: fixed; bottom: 30px; right: 30px; width: 64px; height: 64px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 15px 35px rgba(var(--primary-rgb), 0.4); cursor: pointer; border: none; transition: transform 0.2s; z-index: 50; }
+        .fab:hover { transform: scale(1.1) rotate(90deg); }
+
+        /* --- MOBILE & RESPONSIVE --- */
+        #mobile-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; display: none; opacity: 0; transition: opacity 0.3s; }
+        #mobile-overlay.active { display: block; opacity: 1; }
+
         @media (max-width: 768px) {
-            #sidebar { position: absolute; height: 100%; transform: translateX(-100%); box-shadow: 10px 0 30px rgba(0,0,0,0.1); }
-            #sidebar.active { transform: translateX(0); }
+            #sidebar { position: fixed; top: 0; left: 0; height: 100%; transform: translateX(-100%); box-shadow: 10px 0 30px rgba(0,0,0,0.1); width: 80%; max-width: 300px; }
+            #sidebar.mobile-open { transform: translateX(0); }
+            body.sidebar-collapsed #sidebar { width: 80%; } /* Disable collapse logic on mobile */
+            
             .modal-window { width: 100%; height: 100%; border-radius: 0; }
             .editor-content { padding: 1.5rem; }
+            .grid-view { grid-template-columns: 1fr; } /* Single column on mobile */
+            .top-bar { padding: 1rem; }
+            .search-input { padding-left: 40px; }
+            .search-icon { left: 14px; }
+            
+            /* Hide non-essential tool buttons on mobile if crowded */
+            .tool-btn-desktop-only { display: none; }
         }
+
+        .hidden { display: none !important; }
+        
+        /* Auth Styles (Kept concise) */
+        .auth-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 999; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .auth-overlay.active { opacity: 1; pointer-events: auto; }
+        .auth-box { background: var(--bg-card); width: 90%; max-width: 400px; padding: 2.5rem; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); transform: scale(0.9); transition: 0.3s; }
+        .auth-overlay.active .auth-box { transform: scale(1); }
+        .form-input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px; background: var(--bg-body); color: var(--text-main); font-family: var(--font-sans); }
+        .btn-primary { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: var(--font-sans); }
     </style>
 </head>
-<body>
+<body class="">
+
+    <!-- MOBILE OVERLAY -->
+    <div id="mobile-overlay" onclick="ui.toggleSidebar(false)"></div>
 
     <!-- SIDEBAR -->
     <aside id="sidebar">
         <div class="logo">
-            <img src="Falcon Logo.png" alt="Logo" onerror="this.style.display='none'; document.getElementById('backup-icon').style.display='block'">
-            <i id="backup-icon" class="ph-fill ph-notebook" style="display:none"></i>
-            Falcon <span class="badge">PRO</span>
+            <img src="https://cdn-icons-png.flaticon.com/512/2965/2965358.png" alt="Falcon" onerror="this.style.display='none'">
+            <span class="logo-text">Falcon <span class="logo-pro">PRO</span></span>
         </div>
         
-        <div id="mode-badge" class="nav-item" style="background: #ffeaa7; color: #d35400; margin-bottom: 1rem; cursor: default;">
-            <i class="ph-fill ph-hard-drives"></i> Local Mode
+        <div id="mode-badge" class="local">
+            <i class="ph-fill ph-hard-drives"></i> <span id="mode-text">লোকাল মোড</span>
         </div>
 
         <!-- AUTH SECTION -->
         <div class="nav-group">
-            <div class="nav-header">Account</div>
+            <div class="nav-header">একাউন্ট</div>
             
             <div id="login-trigger" class="nav-item" onclick="authUI.open('login')">
-                <i class="ph ph-sign-in"></i> Login / Register
+                <i class="ph ph-sign-in"></i> <span class="nav-text">লগইন / রেজিস্টার</span>
             </div>
             
             <div id="user-info" class="hidden">
                 <div class="user-card">
                     <div id="user-avatar" class="user-avatar">U</div>
-                    <div class="user-info">
+                    <div class="user-info-text">
                         <span id="user-name" class="user-name">User</span>
-                        <span class="user-status">● Cloud Active</span>
+                        <span class="user-status">● সিঙ্ক চালু আছে</span>
                     </div>
                 </div>
                 <div class="nav-item" onclick="cloudAuth.logout()" style="color: #ff4757;">
-                    <i class="ph ph-sign-out"></i> Logout
+                    <i class="ph ph-sign-out"></i> <span class="nav-text">লগআউট</span>
                 </div>
             </div>
         </div>
 
         <div class="nav-group">
-            <div class="nav-header">Library</div>
-            <div class="nav-item active" onclick="app.setFilter('all')"><i class="ph ph-cards"></i> All Notes</div>
-            <div class="nav-item" onclick="app.setFilter('favorites')"><i class="ph ph-star"></i> Favorites</div>
-            <div class="nav-item" onclick="app.setFilter('trash')"><i class="ph ph-trash"></i> Trash</div>
+            <div class="nav-header">লাইব্রেরি</div>
+            <div class="nav-item active" onclick="app.setFilter('all')"><i class="ph ph-cards"></i> <span class="nav-text">সব নোট</span> <span id="count-all" class="badge">0</span></div>
+            <div class="nav-item" onclick="app.setFilter('favorites')"><i class="ph ph-star"></i> <span class="nav-text">প্রিয় নোট</span></div>
+            <div class="nav-item" onclick="app.setFilter('trash')"><i class="ph ph-trash"></i> <span class="nav-text">ট্র্যাশ</span></div>
         </div>
 
         <div class="nav-group">
-            <div class="nav-header">Folders <i class="ph-bold ph-plus" style="cursor:pointer; float:right;" onclick="app.createFolder()"></i></div>
+            <div class="nav-header">ফোল্ডার <i class="ph-bold ph-plus-circle" style="cursor:pointer; float:right;" onclick="app.createFolder()" title="নতুন ফোল্ডার"></i></div>
             <div id="folder-list"></div>
         </div>
         
         <div style="margin-top:auto">
-            <div class="nav-item" onclick="app.toggleTheme()"><i class="ph ph-moon"></i> Dark Mode</div>
+            <div class="nav-item" onclick="app.toggleTheme()"><i class="ph ph-moon"></i> <span class="nav-text">ডার্ক মোড</span></div>
+            <!-- Desktop Collapse Button -->
+            <div class="nav-item" onclick="ui.toggleCollapse()">
+                <i class="ph ph-arrows-in-line-horizontal"></i> <span class="nav-text">মেনু ছোট করুন</span>
+            </div>
         </div>
     </aside>
 
     <!-- MAIN CONTENT -->
     <main id="main">
         <div class="top-bar">
-            <button class="nav-item" style="border:none; background:none;" onclick="document.getElementById('sidebar').classList.toggle('active')">
-                <i class="ph ph-list" style="font-size:1.5rem"></i>
+            <!-- Mobile Toggle -->
+            <button class="sidebar-toggle-btn" onclick="ui.toggleSidebar(true)">
+                <i class="ph ph-list"></i>
             </button>
+            
             <div class="search-container">
                 <i class="ph ph-magnifying-glass search-icon"></i>
-                <input type="text" class="search-input" placeholder="Search notes..." oninput="app.search(this.value)">
+                <input type="text" class="search-input" placeholder="নোট খুঁজুন..." oninput="app.search(this.value)">
             </div>
         </div>
 
         <div id="content-area">
+            <h2 id="view-title" style="margin-bottom: 20px; font-size: 1.5rem; font-weight:700;">সব নোট</h2>
             <div id="grid-view" class="grid-view"></div>
         </div>
 
         <button class="fab" onclick="app.openEditor()"><i class="ph-bold ph-plus"></i></button>
     </main>
 
-    <!-- AUTH MODAL (IMPROVED) -->
-    <div id="auth-modal" class="auth-overlay">
-        <div class="auth-box">
-            <button class="close-auth" onclick="authUI.close()"><i class="ph-bold ph-x"></i></button>
-            
-            <div class="auth-header">
-                <div class="auth-title">Falcon Cloud</div>
-                <div class="auth-subtitle">আপনার নোটগুলো নিরাপদ রাখুন</div>
-            </div>
-
-            <div class="auth-tabs">
-                <div class="auth-tab active" id="tab-login" onclick="authUI.switchTab('login')">লগইন</div>
-                <div class="auth-tab" id="tab-register" onclick="authUI.switchTab('register')">রেজিস্ট্রেশন</div>
-            </div>
-
-            <!-- LOGIN FORM -->
-            <form id="form-login" onsubmit="cloudAuth.login(event)">
-                <div id="login-msg" class="info-msg"></div>
-                <div id="login-error" class="error-msg"></div>
-
-                <div class="form-group">
-                    <label class="form-label">ইমেইল এড্রেস</label>
-                    <input type="email" class="form-input" id="login-email" required placeholder="name@example.com">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">পাসওয়ার্ড</label>
-                    <input type="password" class="form-input" id="login-pass" required placeholder="••••••••">
-                    <i class="ph ph-eye-slash password-toggle" onclick="authUI.togglePass('login-pass', this)"></i>
-                </div>
-                
-                <button type="submit" class="btn-primary" id="btn-login-submit">লগইন করুন</button>
-                
-                <div class="auth-footer">
-                    <span class="auth-link" onclick="cloudAuth.resetPass()">পাসওয়ার্ড ভুলে গেছেন?</span>
-                    <!-- Resend Verification Button (Hidden by default) -->
-                    <div id="resend-area" class="hidden" style="margin-top:10px;">
-                        <span style="color:#e74c3c">মেইল ভেরিফাই করা হয়নি?</span><br>
-                        <span class="auth-link" onclick="cloudAuth.resendVerification()">ভেরিফিকেশন লিংক আবার পাঠান</span>
-                    </div>
-                </div>
-            </form>
-
-            <!-- REGISTER FORM -->
-            <form id="form-register" class="hidden" onsubmit="cloudAuth.register(event)">
-                <div id="reg-error" class="error-msg"></div>
-                
-                <div class="form-group">
-                    <label class="form-label">আপনার নাম</label>
-                    <input type="text" class="form-input" id="reg-name" required placeholder="Ex: Rakib Hasan">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">ইমেইল এড্রেস</label>
-                    <input type="email" class="form-input" id="reg-email" required placeholder="name@example.com">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">পাসওয়ার্ড (কমপক্ষে ৬ সংখ্যা)</label>
-                    <input type="password" class="form-input" id="reg-pass" required minlength="6" placeholder="••••••••">
-                    <i class="ph ph-eye-slash password-toggle" onclick="authUI.togglePass('reg-pass', this)"></i>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">পাসওয়ার্ড নিশ্চিত করুন</label>
-                    <input type="password" class="form-input" id="reg-pass-confirm" required placeholder="••••••••">
-                </div>
-                
-                <button type="submit" class="btn-primary" id="btn-reg-submit">একাউন্ট খুলুন</button>
-                <div class="auth-footer">একটি ভেরিফিকেশন লিংক পাঠানো হবে।</div>
-            </form>
-        </div>
-    </div>
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container"></div>
 
     <!-- EDITOR MODAL -->
     <div id="editor-modal" class="modal-overlay">
         <div class="modal-window">
             <div class="toolbar">
-                <button class="tool-btn" onclick="document.getElementById('editor-modal').classList.remove('open'); app.saveNote();"><i class="ph-bold ph-arrow-left"></i></button>
-                <button class="tool-btn" onclick="app.format('bold')"><i class="ph-bold ph-text-b"></i></button>
-                <button class="tool-btn" onclick="app.format('italic')"><i class="ph-bold ph-text-i"></i></button>
+                <button class="tool-btn" onclick="app.closeEditor()"><i class="ph-bold ph-arrow-left"></i></button>
+                <div class="tool-divider"></div>
+                
+                <button class="tool-btn" onclick="app.format('bold')" title="বোল্ড"><i class="ph-bold ph-text-b"></i></button>
+                <button class="tool-btn" onclick="app.format('italic')" title="ইটালিক"><i class="ph-bold ph-text-i"></i></button>
+                <button class="tool-btn" onclick="app.format('underline')" title="আন্ডারলাইন"><i class="ph-bold ph-text-u"></i></button>
+                <button class="tool-btn" onclick="app.format('insertUnorderedList')" title="লিস্ট"><i class="ph-bold ph-list-bullets"></i></button>
+                
+                <div class="tool-divider"></div>
+                
+                <!-- NEW FEATURES -->
+                <button id="mic-btn" class="tool-btn" onclick="app.toggleDictation()" title="ভয়েস টাইপিং (বাংলা/ইংরেজি)"><i class="ph-bold ph-microphone"></i></button>
+                <button class="tool-btn tool-btn-desktop-only" onclick="app.exportPDF()" title="পিডিএফ সেভ করুন"><i class="ph-bold ph-file-pdf"></i></button>
+                
                 <div style="flex:1"></div>
+                
+                <span id="save-status" style="font-size:0.8rem; color:var(--text-muted); margin-right:10px;">সংরক্ষিত</span>
                 <button class="tool-btn" onclick="app.toggleNoteLock()"><i class="ph-bold ph-lock-key"></i></button>
                 <button class="tool-btn" onclick="app.deleteNote()" style="color:#ff4757"><i class="ph-bold ph-trash"></i></button>
             </div>
-            <div class="editor-content">
-                <input type="text" id="note-title" class="editor-title" placeholder="Untitled Note">
-                <div id="note-body" contenteditable="true" style="outline:none; min-height:300px;" placeholder="Start typing..."></div>
+            
+            <div class="editor-content" id="editor-pdf-area">
+                <input type="text" id="note-title" class="editor-title" placeholder="শিরোনাম..." oninput="app.autoSave()">
+                <div id="note-body" contenteditable="true" style="outline:none; min-height:60vh;" placeholder="এখানে লিখুন..." oninput="app.autoSave()"></div>
+            </div>
+            
+            <div class="word-count" id="word-count">০ শব্দ</div>
+        </div>
+    </div>
+
+    <!-- AUTH MODAL (Simplified) -->
+    <div id="auth-modal" class="auth-overlay">
+        <div class="auth-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="font-size:1.5rem;">ফ্যালকন ক্লাউড</h2>
+                <button onclick="authUI.close()" style="background:none; border:none; font-size:1.2rem; cursor:pointer;"><i class="ph-bold ph-x"></i></button>
+            </div>
+            
+            <div id="auth-forms">
+                <!-- Forms injected via JS -->
             </div>
         </div>
     </div>
@@ -320,195 +351,147 @@
             appId: "1:925441691750:web:4aacc9e1d4c30f58d21da7"
         };
 
+        // Initialize Firebase
         const fApp = initializeApp(firebaseConfig);
         const auth = getAuth(fApp);
         const db = getDatabase(fApp);
 
-        // --- AUTH UI MANAGER ---
-        window.authUI = {
-            open(tab = 'login') {
-                document.getElementById('auth-modal').classList.add('active');
-                this.switchTab(tab);
+        // --- HELPER: EN to BN Number ---
+        function toBanglaNum(str) {
+            const bn = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+            return String(str).replace(/[0-9]/g, w => bn[+w]);
+        }
+
+        // --- UI MANAGER ---
+        window.ui = {
+            showToast(msg, type = 'success') {
+                const container = document.getElementById('toast-container');
+                const el = document.createElement('div');
+                el.className = `toast ${type}`;
+                el.innerHTML = type === 'success' ? `<i class="ph-bold ph-check-circle"></i> ${msg}` : `<i class="ph-bold ph-warning-circle"></i> ${msg}`;
+                container.appendChild(el);
+                setTimeout(() => {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(20px)';
+                    setTimeout(() => el.remove(), 300);
+                }, 3000);
             },
-            close() {
-                document.getElementById('auth-modal').classList.remove('active');
-            },
-            switchTab(tab) {
-                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-                document.getElementById('tab-' + tab).classList.add('active');
-                
-                if (tab === 'login') {
-                    document.getElementById('form-login').classList.remove('hidden');
-                    document.getElementById('form-register').classList.add('hidden');
+            toggleSidebar(forceOpen) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('mobile-overlay');
+                if (forceOpen === true) {
+                    sidebar.classList.add('mobile-open');
+                    overlay.classList.add('active');
+                } else if (forceOpen === false) {
+                    sidebar.classList.remove('mobile-open');
+                    overlay.classList.remove('active');
                 } else {
-                    document.getElementById('form-login').classList.add('hidden');
-                    document.getElementById('form-register').classList.remove('hidden');
-                }
-                
-                // Clear UI
-                this.clearMessages();
-            },
-            togglePass(fieldId, icon) {
-                const input = document.getElementById(fieldId);
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.classList.replace('ph-eye-slash', 'ph-eye');
-                } else {
-                    input.type = 'password';
-                    icon.classList.replace('ph-eye', 'ph-eye-slash');
+                    sidebar.classList.toggle('mobile-open');
+                    overlay.classList.toggle('active');
                 }
             },
-            showError(msg, type='login') {
-                const el = document.getElementById(type === 'login' ? 'login-error' : 'reg-error');
-                el.innerText = msg;
-                el.style.display = 'block';
+            toggleCollapse() {
+                document.body.classList.toggle('sidebar-collapsed');
+                // Save preference
+                localStorage.setItem('sidebar_collapsed', document.body.classList.contains('sidebar-collapsed'));
             },
-            showInfo(msg) {
-                const el = document.getElementById('login-msg');
-                el.innerText = msg;
-                el.style.display = 'block';
-            },
-            clearMessages() {
-                document.querySelectorAll('.error-msg, .info-msg').forEach(e => e.style.display = 'none');
-                document.getElementById('resend-area').classList.add('hidden');
+            updateWordCount() {
+                const text = document.getElementById('note-body').innerText || "";
+                const count = text.trim().split(/\s+/).filter(a => a).length;
+                document.getElementById('word-count').innerText = toBanglaNum(count) + ' শব্দ';
             }
         };
 
-        // --- HELPER: Translate Firebase Errors to Bengali ---
-        function getBanglaErrorMessage(code) {
-            switch(code) {
-                case 'auth/email-already-in-use': return "এই ইমেইল দিয়ে ইতিমধ্যে একটি একাউন্ট খোলা আছে।";
-                case 'auth/invalid-email': return "ইমেইল ঠিকানাটি সঠিক নয়।";
-                case 'auth/weak-password': return "পাসওয়ার্ড দুর্বল। অন্তত ৬ সংখ্যার পাসওয়ার্ড দিন।";
-                case 'auth/user-not-found': return "এই ইমেইলে কোনো একাউন্ট পাওয়া যায়নি।";
-                case 'auth/wrong-password': return "ভুল পাসওয়ার্ড। আবার চেষ্টা করুন।";
-                case 'auth/too-many-requests': return "অতিরিক্ত চেষ্টার কারণে সাময়িকভাবে ব্লক করা হয়েছে। কিছুক্ষণ পর চেষ্টা করুন।";
-                case 'auth/network-request-failed': return "ইন্টারনেট সংযোগ পরীক্ষা করুন।";
-                case 'auth/user-disabled': return "এই একাউন্টটি নিস্ক্রিয় করা হয়েছে।";
-                default: return "কোথাও সমস্যা হয়েছে: " + code;
-            }
+        // Restore sidebar state
+        if(localStorage.getItem('sidebar_collapsed') === 'true') {
+            document.body.classList.add('sidebar-collapsed');
         }
+
+        // --- AUTH UI ---
+        window.authUI = {
+            open(mode) {
+                document.getElementById('auth-modal').classList.add('active');
+                this.renderForm(mode);
+            },
+            close() { document.getElementById('auth-modal').classList.remove('active'); },
+            renderForm(mode) {
+                const container = document.getElementById('auth-forms');
+                if(mode === 'login') {
+                    container.innerHTML = `
+                        <form onsubmit="cloudAuth.login(event)">
+                            <input type="email" id="login-email" class="form-input" placeholder="ইমেইল এড্রেস" required>
+                            <input type="password" id="login-pass" class="form-input" placeholder="পাসওয়ার্ড" required>
+                            <button type="submit" class="btn-primary">লগইন করুন</button>
+                            <p style="text-align:center; margin-top:15px; font-size:0.9rem;">
+                                একাউন্ট নেই? <a href="#" onclick="authUI.renderForm('register')" style="color:var(--primary)">রেজিস্টার করুন</a>
+                            </p>
+                            <p style="text-align:center; margin-top:5px; font-size:0.8rem;">
+                                <a href="#" onclick="cloudAuth.resetPass()" style="color:var(--text-muted)">পাসওয়ার্ড ভুলে গেছেন?</a>
+                            </p>
+                        </form>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <form onsubmit="cloudAuth.register(event)">
+                            <input type="text" id="reg-name" class="form-input" placeholder="আপনার নাম" required>
+                            <input type="email" id="reg-email" class="form-input" placeholder="ইমেইল এড্রেস" required>
+                            <input type="password" id="reg-pass" class="form-input" placeholder="পাসওয়ার্ড (কমপক্ষে ৬ সংখ্যা)" minlength="6" required>
+                            <button type="submit" class="btn-primary">একাউন্ট খুলুন</button>
+                            <p style="text-align:center; margin-top:15px; font-size:0.9rem;">
+                                একাউন্ট আছে? <a href="#" onclick="authUI.renderForm('login')" style="color:var(--primary)">লগইন করুন</a>
+                            </p>
+                        </form>
+                    `;
+                }
+            }
+        };
 
         // --- CLOUD AUTH LOGIC ---
         window.cloudAuth = {
-            tempUser: null, // To store user for resending verification
-
-            // 1. REGISTER
             register: async (e) => {
                 e.preventDefault();
-                authUI.clearMessages();
-
                 const name = document.getElementById('reg-name').value;
                 const email = document.getElementById('reg-email').value;
                 const pass = document.getElementById('reg-pass').value;
-                const confirmPass = document.getElementById('reg-pass-confirm').value;
-                const btn = document.getElementById('btn-reg-submit');
-
-                // Validation
-                if(pass !== confirmPass) {
-                    return authUI.showError("পাসওয়ার্ড দুটি মিলছে না!", 'register');
-                }
-
-                try {
-                    btn.innerText = "একাউন্ট তৈরি হচ্ছে..."; btn.disabled = true;
-                    
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-                    const user = userCredential.user;
-
-                    // Update Profile
-                    await updateProfile(user, { displayName: name });
-                    
-                    // Send Verify Email
-                    await sendEmailVerification(user);
-                    
-                    // Auto switch to login tab with message
-                    await signOut(auth);
-                    
-                    document.getElementById('login-email').value = email; // Prefill email
-                    authUI.switchTab('login');
-                    authUI.showInfo("✅ একাউন্ট তৈরি সফল! আপনার ইমেইল চেক করে ভেরিফাই করুন।");
-
-                } catch (error) {
-                    console.error(error);
-                    authUI.showError(getBanglaErrorMessage(error.code), 'register');
-                } finally {
-                    btn.innerText = "একাউন্ট খুলুন"; btn.disabled = false;
-                }
-            },
-
-            // 2. LOGIN
-            login: async (e) => {
-                e.preventDefault();
-                authUI.clearMessages();
-
-                const email = document.getElementById('login-email').value;
-                const pass = document.getElementById('login-pass').value;
-                const btn = document.getElementById('btn-login-submit');
-
-                try {
-                    btn.innerText = "যাচাই করা হচ্ছে..."; btn.disabled = true;
-                    const userCredential = await signInWithEmailAndPassword(auth, email, pass);
-                    const user = userCredential.user;
-
-                    // CHECK VERIFICATION
-                    if (!user.emailVerified) {
-                        this.tempUser = user; // Save for resend
-                        await signOut(auth); 
-                        authUI.showError("⚠️ আপনার ইমেইল ভেরিফাই করা হয়নি। মেইল চেক করুন।");
-                        document.getElementById('resend-area').classList.remove('hidden');
-                        return;
-                    }
-
-                    // Success
-                    authUI.close();
-                    document.getElementById('login-pass').value = ""; // Clear pass
-                    
-                } catch (error) {
-                    console.error(error);
-                    authUI.showError(getBanglaErrorMessage(error.code));
-                } finally {
-                    btn.innerText = "লগইন করুন"; btn.disabled = false;
-                }
-            },
-
-            // 3. RESEND VERIFICATION
-            resendVerification: async () => {
-                if(!this.tempUser) return alert("দয়া করে আগে লগইন করার চেষ্টা করুন।");
                 
                 try {
-                    // Note: User must be effectively 'signed in' to send verify email in some SDK versions, 
-                    // but we signed them out. We might need to handle this carefully.
-                    // Trick: We assume they just tried to login, so we might need to prompt login again or just inform.
-                    // Actually, sendEmailVerification requires a User object from a signed-in state usually.
-                    // Since we signed out, we can't send it directly without them signing in again.
-                    // FIX: We will just alert instructions because re-signing in silently is insecure here without password.
-                    
-                    alert("সুরক্ষার স্বার্থে, অনুগ্রহ করে আবার লগইন বাটনে ক্লিক করুন। লগইন হওয়ার সাথে সাথে আমরা নতুন ভেরিফিকেশন লিংক পাঠাবো।");
-                    // In a real robust app, we would keep them signed in but blocked by UI. 
-                    // Here we keep it simple.
-                    
-                } catch(e) {
-                    alert("সমস্যা: " + e.message);
-                }
-            },
-
-            // 4. LOGOUT
-            logout: async () => {
-                if(confirm("আপনি কি নিশ্চিত যে আপনি লগআউট করতে চান?")) {
+                    ui.showToast("একাউন্ট তৈরি হচ্ছে...", "success");
+                    const uc = await createUserWithEmailAndPassword(auth, email, pass);
+                    await updateProfile(uc.user, { displayName: name });
+                    await sendEmailVerification(uc.user);
                     await signOut(auth);
+                    authUI.open('login');
+                    ui.showToast("একাউন্ট তৈরি হয়েছে! ইমেইল ভেরিফাই করুন।", "success");
+                } catch (err) { ui.showToast("সমস্যা: " + err.message, "error"); }
+            },
+            login: async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const pass = document.getElementById('login-pass').value;
+                
+                try {
+                    const uc = await signInWithEmailAndPassword(auth, email, pass);
+                    if(!uc.user.emailVerified) {
+                        await signOut(auth);
+                        return ui.showToast("দয়া করে আগে ইমেইল ভেরিফাই করুন!", "error");
+                    }
+                    authUI.close();
+                    ui.showToast("লগইন সফল হয়েছে!", "success");
+                } catch (err) { ui.showToast("ভুল ইমেইল বা পাসওয়ার্ড", "error"); }
+            },
+            logout: async () => {
+                if(confirm("আপনি কি নিশ্চিত লগআউট করবেন?")) {
+                    await signOut(auth);
+                    ui.showToast("লগআউট হয়েছে", "success");
                 }
             },
-
-            // 5. RESET PASSWORD
             resetPass: async () => {
-                const email = prompt("আপনার ইমেইল দিন (যেখানে রিসেট লিংক যাবে):");
+                const email = prompt("আপনার ইমেইল দিন:");
                 if(email) {
                     try {
                         await sendPasswordResetEmail(auth, email);
-                        alert("✅ পাসওয়ার্ড রিসেট লিংক আপনার ইমেইলে পাঠানো হয়েছে।");
-                    } catch(e) { 
-                        alert("ত্রুটি: " + getBanglaErrorMessage(e.code)); 
-                    }
+                        ui.showToast("রিসেট লিংক ইমেইলে পাঠানো হয়েছে", "success");
+                    } catch(e) { ui.showToast(e.message, "error"); }
                 }
             }
         };
@@ -516,55 +499,71 @@
         // --- APP LOGIC ---
         window.app = {
             notes: [],
-            folders: ['Personal', 'Work'],
+            folders: ['ব্যক্তিগত', 'কাজ', 'আইডিয়া'],
             currentNoteId: null,
             filter: 'all',
+            recognition: null,
 
             init() {
+                // Auth Listener
                 onAuthStateChanged(auth, (user) => {
                     const badge = document.getElementById('mode-badge');
+                    const modeText = document.getElementById('mode-text');
                     const loginBtn = document.getElementById('login-trigger');
                     const userInfo = document.getElementById('user-info');
-
+                    
                     if (user && user.emailVerified) {
-                        // LOGGED IN & VERIFIED
                         window.currentUser = user;
-                        
                         loginBtn.classList.add('hidden');
                         userInfo.classList.remove('hidden');
                         document.getElementById('user-name').innerText = user.displayName || "ব্যবহারকারী";
                         document.getElementById('user-avatar').innerText = (user.displayName || "U")[0].toUpperCase();
-
-                        badge.style.background = '#d1f2eb';
-                        badge.style.color = '#0e6655';
-                        badge.innerHTML = '<i class="ph-fill ph-cloud"></i> ক্লাউড মোড';
+                        
+                        badge.className = 'cloud';
+                        badge.innerHTML = '<i class="ph-fill ph-cloud-check" style="font-size:1.2rem"></i> <span id="mode-text">ক্লাউড মোড</span>';
                         
                         this.loadFromCloud(user.uid);
                     } else {
-                        // LOGGED OUT
                         window.currentUser = null;
-                        
                         loginBtn.classList.remove('hidden');
                         userInfo.classList.add('hidden');
                         
-                        badge.style.background = '#ffeaa7';
-                        badge.style.color = '#d35400';
-                        badge.innerHTML = '<i class="ph-fill ph-hard-drives"></i> লোকাল মোড';
+                        badge.className = 'local';
+                        badge.innerHTML = '<i class="ph-fill ph-hard-drives" style="font-size:1.2rem"></i> <span id="mode-text">লোকাল মোড</span>';
                         
                         this.loadFromLocal();
                     }
                 });
 
                 this.renderFolders();
+                
+                // Init Speech Recognition
+                if ('webkitSpeechRecognition' in window) {
+                    this.recognition = new webkitSpeechRecognition();
+                    this.recognition.continuous = false;
+                    this.recognition.interimResults = false;
+                    this.recognition.lang = 'bn-BD'; // Default Bengali
+                    
+                    this.recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        document.execCommand("insertText", false, transcript + " ");
+                        ui.updateWordCount();
+                    };
+                    this.recognition.onend = () => {
+                        document.getElementById('mic-btn').classList.remove('active');
+                        document.getElementById('mic-btn').style.color = '';
+                    };
+                } else {
+                    document.getElementById('mic-btn').style.display = 'none';
+                }
             },
 
-            // --- DATA HANDLERS ---
+            // DATA
             loadFromLocal() {
-                const stored = localStorage.getItem('falcon_notes_v2');
+                const stored = localStorage.getItem('falcon_notes_v3');
                 this.notes = stored ? JSON.parse(stored) : [];
                 this.render();
             },
-            
             loadFromCloud(uid) {
                 const notesRef = ref(db, 'users/' + uid + '/notes');
                 onValue(notesRef, (snapshot) => {
@@ -572,33 +571,51 @@
                     this.render();
                 });
             },
-
             save() {
+                // Update badge count
+                document.getElementById('count-all').innerText = toBanglaNum(this.notes.filter(n=>!n.isTrash).length);
+                
                 if (window.currentUser) {
                     set(ref(db, 'users/' + window.currentUser.uid + '/notes'), this.notes);
                 } else {
-                    localStorage.setItem('falcon_notes_v2', JSON.stringify(this.notes));
+                    localStorage.setItem('falcon_notes_v3', JSON.stringify(this.notes));
                 }
                 this.render();
             },
 
-            // --- NOTE ACTIONS ---
+            // ACTIONS
             openEditor(id = null) {
                 this.currentNoteId = id;
-                let note = id ? this.notes.find(n => n.id === id) : { id: Date.now(), title: '', content: '', folder: 'Personal', isFavorite: false, timestamp: Date.now() };
+                let note = id ? this.notes.find(n => n.id === id) : { id: Date.now(), title: '', content: '', folder: 'ব্যক্তিগত', isFavorite: false, timestamp: Date.now() };
                 
-                // Password check for locked notes
                 if (id && note.isLocked) {
                    const pin = prompt("নোটটি খুলতে পিন দিন (ডিফল্ট: 1234)");
-                   if(pin !== "1234") return alert("ভুল পিন!");
+                   if(pin !== "1234") return ui.showToast("ভুল পিন", "error");
                 }
 
-                if(!id) this.notes.unshift(note);
+                if(!id) this.notes.unshift(note); // Add new to top
                 this.currentNoteId = note.id;
 
                 document.getElementById('note-title').value = note.title;
                 document.getElementById('note-body').innerHTML = note.content;
                 document.getElementById('editor-modal').classList.add('open');
+                ui.updateWordCount();
+            },
+            
+            closeEditor() {
+                this.saveNote(); // Ensure saved
+                document.getElementById('editor-modal').classList.remove('open');
+            },
+
+            autoSaveTimeout: null,
+            autoSave() {
+                document.getElementById('save-status').innerText = "সেভ হচ্ছে...";
+                clearTimeout(this.autoSaveTimeout);
+                this.autoSaveTimeout = setTimeout(() => {
+                    this.saveNote();
+                    document.getElementById('save-status').innerText = "সংরক্ষিত";
+                    ui.updateWordCount();
+                }, 1000);
             },
             
             saveNote() {
@@ -612,61 +629,128 @@
             },
             
             deleteNote() {
-                if(confirm("আপনি কি নিশ্চিত এই নোটটি ডিলিট করতে চান?")) {
-                    this.notes = this.notes.filter(n => n.id !== this.currentNoteId);
+                if(confirm("নোটটি ট্র্যাশে পাঠাতে চান?")) {
+                    const note = this.notes.find(n => n.id === this.currentNoteId);
+                    note.isTrash = true;
                     this.save();
                     document.getElementById('editor-modal').classList.remove('open');
+                    ui.showToast("নোট ট্র্যাশে পাঠানো হয়েছে", "success");
                 }
             },
             
             toggleNoteLock() {
                 const note = this.notes.find(n => n.id === this.currentNoteId);
                 note.isLocked = !note.isLocked;
-                alert(note.isLocked ? "নোট লক করা হয়েছে" : "নোট আনলক করা হয়েছে");
+                ui.showToast(note.isLocked ? "নোট লক করা হয়েছে" : "নোট আনলক করা হয়েছে", "success");
                 this.save();
             },
 
-            // --- RENDERING ---
+            // FEATURES
+            toggleDictation() {
+                if(!this.recognition) return;
+                const btn = document.getElementById('mic-btn');
+                if(btn.classList.contains('active')) {
+                    this.recognition.stop();
+                } else {
+                    btn.classList.add('active');
+                    btn.style.color = 'var(--primary)';
+                    this.recognition.start();
+                    ui.showToast("কথা বলুন...", "success");
+                }
+            },
+            
+            exportPDF() {
+                const element = document.getElementById('editor-pdf-area');
+                const opt = {
+                    margin: 1,
+                    filename: (document.getElementById('note-title').value || 'Note') + '.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                };
+                html2pdf().set(opt).from(element).save();
+                ui.showToast("পিডিএফ তৈরি হচ্ছে...", "success");
+            },
+
+            // RENDER
             render() {
                 let filtered = this.notes;
-                if (this.filter === 'favorites') filtered = filtered.filter(n => n.isFavorite);
-                if (this.filter === 'trash') filtered = filtered.filter(n => n.isTrash); 
-                if (this.filter.startsWith('folder:')) {
-                    filtered = filtered.filter(n => n.folder === this.filter.split(':')[1]);
+                const titleEl = document.getElementById('view-title');
+
+                if (this.filter === 'favorites') {
+                    filtered = filtered.filter(n => n.isFavorite && !n.isTrash);
+                    titleEl.innerText = "প্রিয় নোট";
+                } else if (this.filter === 'trash') {
+                    filtered = filtered.filter(n => n.isTrash);
+                    titleEl.innerText = "ট্র্যাশ";
+                } else if (this.filter.startsWith('folder:')) {
+                    const fname = this.filter.split(':')[1];
+                    filtered = filtered.filter(n => n.folder === fname && !n.isTrash);
+                    titleEl.innerText = fname;
+                } else {
+                    filtered = filtered.filter(n => !n.isTrash);
+                    titleEl.innerText = "সব নোট";
                 }
+
+                // Update counts
+                document.getElementById('count-all').innerText = toBanglaNum(this.notes.filter(n=>!n.isTrash).length);
 
                 const html = filtered.map(note => `
                     <div class="note-card ${note.isLocked ? 'locked' : ''}" onclick="app.openEditor(${note.id})">
-                        ${note.isLocked ? '<i class="ph-fill ph-lock-key lock-badge"></i>' : ''}
+                        ${note.isLocked ? '<div class="lock-badge"><i class="ph-fill ph-lock-key"></i></div>' : ''}
                         <div class="note-title">${note.title || 'শিরোনামহীন'}</div>
-                        <div class="note-preview">${note.isLocked ? 'লক করা কন্টেন্ট' : (note.content.replace(/<[^>]*>?/gm, '') || 'কোনো লেখা নেই')}</div>
+                        <div class="note-preview">${note.isLocked ? 'লক করা কন্টেন্ট' : (note.content.replace(/<[^>]*>?/gm, '') || 'কোনো লেখা নেই...')}</div>
                         <div class="note-meta">
                             <span>${new Date(note.timestamp).toLocaleDateString()}</span>
-                            <span>${note.folder}</span>
+                            <span><i class="ph-fill ph-folder"></i> ${note.folder}</span>
                         </div>
                     </div>
                 `).join('');
-                document.getElementById('grid-view').innerHTML = html || '<div style="text-align:center; color:#ccc; grid-column:1/-1;">কোনো নোট পাওয়া যায়নি</div>';
+                document.getElementById('grid-view').innerHTML = html || `
+                    <div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted)">
+                        <i class="ph ph-note-pencil" style="font-size:3rem; margin-bottom:1rem; opacity:0.5;"></i>
+                        <p>কোনো নোট পাওয়া যায়নি</p>
+                    </div>`;
             },
 
-            // --- FOLDER & UTILS ---
             renderFolders() {
                 document.getElementById('folder-list').innerHTML = this.folders.map(f => 
-                    `<div class="nav-item" onclick="app.setFilter('folder:${f}')"><i class="ph ph-folder"></i> ${f}</div>`
+                    `<div class="nav-item" onclick="app.setFilter('folder:${f}')">
+                        <i class="ph ph-folder"></i> <span class="nav-text">${f}</span>
+                    </div>`
                 ).join('');
             },
             createFolder() {
                 const name = prompt("নতুন ফোল্ডারের নাম:");
                 if(name) { this.folders.push(name); this.renderFolders(); }
             },
-            setFilter(f) { this.filter = f; this.render(); document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active')); event.currentTarget.classList.add('active'); },
+            setFilter(f) { 
+                this.filter = f; 
+                this.render(); 
+                document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active')); 
+                event.currentTarget.classList.add('active'); 
+                
+                // Auto close mobile sidebar on selection
+                if(window.innerWidth < 768) ui.toggleSidebar(false);
+            },
             search(q) {
                 const term = q.toLowerCase();
-                const filtered = this.notes.filter(n => (n.title+n.content).toLowerCase().includes(term));
-                this.render(); // Simple re-render
+                if(!term) { this.render(); return; }
+                const filtered = this.notes.filter(n => !n.isTrash && (n.title+n.content).toLowerCase().includes(term));
+                
+                // Manual render for search
+                document.getElementById('grid-view').innerHTML = filtered.map(note => `
+                    <div class="note-card" onclick="app.openEditor(${note.id})">
+                        <div class="note-title">${note.title}</div>
+                        <div class="note-preview">${note.content.replace(/<[^>]*>?/gm, '')}</div>
+                    </div>
+                `).join('');
             },
             format(cmd) { document.execCommand(cmd, false, null); },
-            toggleTheme() { document.body.setAttribute('data-theme', document.body.getAttribute('data-theme')==='dark'?'light':'dark'); }
+            toggleTheme() { 
+                const current = document.body.getAttribute('data-theme');
+                document.body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark'); 
+            }
         };
 
         app.init();
