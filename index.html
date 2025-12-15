@@ -67,7 +67,8 @@
         body.sidebar-collapsed .nav-text,
         body.sidebar-collapsed .badge,
         body.sidebar-collapsed .user-info-text,
-        body.sidebar-collapsed #mode-text { display: none; opacity: 0; }
+        body.sidebar-collapsed #mode-text,
+        body.sidebar-collapsed .folder-delete-btn { display: none; opacity: 0; }
         
         body.sidebar-collapsed .nav-item { justify-content: center; padding: 12px 0; }
         body.sidebar-collapsed .logo { justify-content: center; }
@@ -84,11 +85,21 @@
         .nav-group { margin-bottom: 2rem; }
         .nav-header { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 0.8rem; padding-left: 0.8rem; white-space: nowrap; }
         
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; color: var(--text-muted); cursor: pointer; transition: all 0.2s; font-size: 1rem; font-weight: 500; user-select: none; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; color: var(--text-muted); cursor: pointer; transition: all 0.2s; font-size: 1rem; font-weight: 500; user-select: none; position: relative; }
         .nav-item:hover { background: rgba(var(--primary-rgb), 0.05); color: var(--primary); transform: translateX(3px); }
         .nav-item.active { background: rgba(var(--primary-rgb), 0.1); color: var(--primary); font-weight: 600; }
         .nav-item i { font-size: 1.2rem; min-width: 24px; text-align: center; }
         
+        .folder-delete-btn {
+            margin-left: auto;
+            opacity: 0;
+            transition: 0.2s;
+            padding: 4px;
+            border-radius: 4px;
+        }
+        .nav-item:hover .folder-delete-btn { opacity: 1; }
+        .folder-delete-btn:hover { background: #ff4757; color: white; }
+
         .badge { background: var(--primary); color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; margin-left: auto; letter-spacing: 0.5px; }
 
         /* Modern Mode Badge */
@@ -211,7 +222,8 @@
     <!-- SIDEBAR -->
     <aside id="sidebar">
         <div class="logo">
-            <img src="https://cdn-icons-png.flaticon.com/512/2965/2965358.png" alt="Falcon" onerror="this.style.display='none'">
+            <!-- Updated Logo Link -->
+            <img src="https://i.postimg.cc/1XbhDYBk/Falcon-Logo.png" alt="Falcon" onerror="this.style.display='none'">
             <span class="logo-text">Falcon <span class="logo-pro">PRO</span></span>
         </div>
         
@@ -309,7 +321,8 @@
                 
                 <span id="save-status" style="font-size:0.8rem; color:var(--text-muted); margin-right:10px;">সংরক্ষিত</span>
                 <button class="tool-btn" onclick="app.toggleNoteLock()"><i class="ph-bold ph-lock-key"></i></button>
-                <button class="tool-btn" onclick="app.deleteNote()" style="color:#ff4757"><i class="ph-bold ph-trash"></i></button>
+                <!-- Delete Button -->
+                <button class="tool-btn" id="btn-delete" onclick="app.deleteNote()" style="color:#ff4757" title="ডিলিট"><i class="ph-bold ph-trash"></i></button>
             </div>
             
             <div class="editor-content" id="editor-pdf-area">
@@ -392,7 +405,6 @@
             },
             toggleCollapse() {
                 document.body.classList.toggle('sidebar-collapsed');
-                // Save preference
                 localStorage.setItem('sidebar_collapsed', document.body.classList.contains('sidebar-collapsed'));
             },
             updateWordCount() {
@@ -402,7 +414,6 @@
             }
         };
 
-        // Restore sidebar state
         if(localStorage.getItem('sidebar_collapsed') === 'true') {
             document.body.classList.add('sidebar-collapsed');
         }
@@ -499,16 +510,18 @@
         // --- APP LOGIC ---
         window.app = {
             notes: [],
-            folders: ['ব্যক্তিগত', 'কাজ', 'আইডিয়া'],
+            folders: ['ব্যক্তিগত', 'কাজ', 'আইডিয়া'], // Default folders
             currentNoteId: null,
             filter: 'all',
             recognition: null,
 
             init() {
-                // Auth Listener
+                // 1. ALWAYS Load from LocalStorage first (Offline Hybrid Mode)
+                this.loadFromLocal();
+
+                // 2. Auth Listener
                 onAuthStateChanged(auth, (user) => {
                     const badge = document.getElementById('mode-badge');
-                    const modeText = document.getElementById('mode-text');
                     const loginBtn = document.getElementById('login-trigger');
                     const userInfo = document.getElementById('user-info');
                     
@@ -522,7 +535,8 @@
                         badge.className = 'cloud';
                         badge.innerHTML = '<i class="ph-fill ph-cloud-check" style="font-size:1.2rem"></i> <span id="mode-text">ক্লাউড মোড</span>';
                         
-                        this.loadFromCloud(user.uid);
+                        // Sync with Cloud
+                        this.syncWithCloud(user.uid);
                     } else {
                         window.currentUser = null;
                         loginBtn.classList.remove('hidden');
@@ -530,19 +544,15 @@
                         
                         badge.className = 'local';
                         badge.innerHTML = '<i class="ph-fill ph-hard-drives" style="font-size:1.2rem"></i> <span id="mode-text">লোকাল মোড</span>';
-                        
-                        this.loadFromLocal();
                     }
                 });
 
-                this.renderFolders();
-                
                 // Init Speech Recognition
                 if ('webkitSpeechRecognition' in window) {
                     this.recognition = new webkitSpeechRecognition();
                     this.recognition.continuous = false;
                     this.recognition.interimResults = false;
-                    this.recognition.lang = 'bn-BD'; // Default Bengali
+                    this.recognition.lang = 'bn-BD'; 
                     
                     this.recognition.onresult = (event) => {
                         const transcript = event.results[0][0].transcript;
@@ -558,52 +568,96 @@
                 }
             },
 
-            // DATA
+            // --- DATA MANAGEMENT (HYBRID) ---
+            
+            // Load from LocalStorage
             loadFromLocal() {
-                const stored = localStorage.getItem('falcon_notes_v3');
-                this.notes = stored ? JSON.parse(stored) : [];
+                const storedNotes = localStorage.getItem('falcon_notes_v3');
+                if (storedNotes) this.notes = JSON.parse(storedNotes);
+                
+                const storedFolders = localStorage.getItem('falcon_folders_v3');
+                if (storedFolders) this.folders = JSON.parse(storedFolders);
+                
                 this.render();
+                this.renderFolders();
             },
-            loadFromCloud(uid) {
+
+            // Sync with Cloud
+            syncWithCloud(uid) {
+                // Listen for Notes
                 const notesRef = ref(db, 'users/' + uid + '/notes');
                 onValue(notesRef, (snapshot) => {
-                    this.notes = snapshot.val() || [];
-                    this.render();
+                    const cloudNotes = snapshot.val();
+                    if (cloudNotes) {
+                        this.notes = cloudNotes;
+                        // Update LocalStorage to keep offline cache fresh
+                        localStorage.setItem('falcon_notes_v3', JSON.stringify(this.notes));
+                        this.render();
+                    }
+                });
+
+                // Listen for Folders
+                const foldersRef = ref(db, 'users/' + uid + '/folders');
+                onValue(foldersRef, (snapshot) => {
+                    const cloudFolders = snapshot.val();
+                    if (cloudFolders) {
+                        this.folders = cloudFolders;
+                        localStorage.setItem('falcon_folders_v3', JSON.stringify(this.folders));
+                        this.renderFolders();
+                    }
                 });
             },
+
+            // Save to Storage (Local + Cloud if logged in)
             save() {
-                // Update badge count
-                document.getElementById('count-all').innerText = toBanglaNum(this.notes.filter(n=>!n.isTrash).length);
+                // 1. Save to Local (Always)
+                localStorage.setItem('falcon_notes_v3', JSON.stringify(this.notes));
+                localStorage.setItem('falcon_folders_v3', JSON.stringify(this.folders));
                 
+                // Update UI counts
+                document.getElementById('count-all').innerText = toBanglaNum(this.notes.filter(n=>!n.isTrash).length);
+
+                // 2. Save to Cloud (If Online)
                 if (window.currentUser) {
                     set(ref(db, 'users/' + window.currentUser.uid + '/notes'), this.notes);
-                } else {
-                    localStorage.setItem('falcon_notes_v3', JSON.stringify(this.notes));
+                    set(ref(db, 'users/' + window.currentUser.uid + '/folders'), this.folders);
                 }
+                
                 this.render();
             },
 
             // ACTIONS
             openEditor(id = null) {
                 this.currentNoteId = id;
-                let note = id ? this.notes.find(n => n.id === id) : { id: Date.now(), title: '', content: '', folder: 'ব্যক্তিগত', isFavorite: false, timestamp: Date.now() };
+                let note = id ? this.notes.find(n => n.id === id) : { id: Date.now(), title: '', content: '', folder: 'ব্যক্তিগত', isFavorite: false, timestamp: Date.now(), isTrash: false };
                 
                 if (id && note.isLocked) {
                    const pin = prompt("নোটটি খুলতে পিন দিন (ডিফল্ট: 1234)");
                    if(pin !== "1234") return ui.showToast("ভুল পিন", "error");
                 }
 
-                if(!id) this.notes.unshift(note); // Add new to top
+                if(!id) this.notes.unshift(note); 
                 this.currentNoteId = note.id;
 
                 document.getElementById('note-title').value = note.title;
                 document.getElementById('note-body').innerHTML = note.content;
+                
+                // Change Delete Button Icon/Action based on status
+                const delBtn = document.getElementById('btn-delete');
+                if (note.isTrash) {
+                    delBtn.setAttribute('title', 'স্থায়ীভাবে মুছুন');
+                    delBtn.innerHTML = '<i class="ph-bold ph-trash-simple"></i>'; // different icon
+                } else {
+                    delBtn.setAttribute('title', 'ট্র্যাশে পাঠান');
+                    delBtn.innerHTML = '<i class="ph-bold ph-trash"></i>';
+                }
+
                 document.getElementById('editor-modal').classList.add('open');
                 ui.updateWordCount();
             },
             
             closeEditor() {
-                this.saveNote(); // Ensure saved
+                this.saveNote(); 
                 document.getElementById('editor-modal').classList.remove('open');
             },
 
@@ -629,12 +683,25 @@
             },
             
             deleteNote() {
-                if(confirm("নোটটি ট্র্যাশে পাঠাতে চান?")) {
-                    const note = this.notes.find(n => n.id === this.currentNoteId);
-                    note.isTrash = true;
-                    this.save();
-                    document.getElementById('editor-modal').classList.remove('open');
-                    ui.showToast("নোট ট্র্যাশে পাঠানো হয়েছে", "success");
+                const note = this.notes.find(n => n.id === this.currentNoteId);
+                if (!note) return;
+
+                if (note.isTrash) {
+                    // PERMANENT DELETE
+                    if(confirm("আপনি কি নিশ্চিত এটি একেবারে মুছে ফেলতে চান? এটি আর ফিরিয়ে আনা যাবে না।")) {
+                        this.notes = this.notes.filter(n => n.id !== this.currentNoteId);
+                        this.save();
+                        document.getElementById('editor-modal').classList.remove('open');
+                        ui.showToast("নোটটি স্থায়ীভাবে মুছে ফেলা হয়েছে", "success");
+                    }
+                } else {
+                    // MOVE TO TRASH
+                    if(confirm("নোটটি ট্র্যাশে পাঠাতে চান?")) {
+                        note.isTrash = true;
+                        this.save();
+                        document.getElementById('editor-modal').classList.remove('open');
+                        ui.showToast("নোট ট্র্যাশে পাঠানো হয়েছে", "success");
+                    }
                 }
             },
             
@@ -643,6 +710,53 @@
                 note.isLocked = !note.isLocked;
                 ui.showToast(note.isLocked ? "নোট লক করা হয়েছে" : "নোট আনলক করা হয়েছে", "success");
                 this.save();
+            },
+
+            // FOLDER MANAGEMENT
+            renderFolders() {
+                const defaultFolders = ['ব্যক্তিগত', 'কাজ', 'আইডিয়া'];
+                
+                document.getElementById('folder-list').innerHTML = this.folders.map(f => {
+                    // Check if it's a default folder
+                    const isDefault = defaultFolders.includes(f);
+                    const deleteHtml = isDefault ? '' : `<i class="ph-bold ph-x folder-delete-btn" onclick="event.stopPropagation(); app.deleteFolder('${f}')" title="ফোল্ডার মুছুন"></i>`;
+                    
+                    return `
+                    <div class="nav-item" onclick="app.setFilter('folder:${f}')">
+                        <i class="ph ph-folder"></i> 
+                        <span class="nav-text" style="flex:1">${f}</span>
+                        ${deleteHtml}
+                    </div>`;
+                }).join('');
+            },
+            
+            createFolder() {
+                const name = prompt("নতুন ফোল্ডারের নাম:");
+                if(name && !this.folders.includes(name)) { 
+                    this.folders.push(name); 
+                    this.save(); // Save immediately
+                    this.renderFolders(); 
+                } else if (this.folders.includes(name)) {
+                    ui.showToast("এই নামের ফোল্ডার ইতিমধ্যেই আছে", "error");
+                }
+            },
+
+            deleteFolder(folderName) {
+                if(confirm(`"${folderName}" ফোল্ডারটি ডিলিট করতে চান? এর ভেতরের নোটগুলো ট্র্যাশে চলে যাবে।`)) {
+                    // 1. Remove folder
+                    this.folders = this.folders.filter(f => f !== folderName);
+                    
+                    // 2. Move notes in this folder to Trash (optional, or just move to 'Uncategorized'?)
+                    // Let's move them to trash for safety
+                    this.notes.forEach(n => {
+                        if(n.folder === folderName) n.isTrash = true;
+                    });
+
+                    this.save();
+                    this.renderFolders();
+                    this.setFilter('all'); // Reset view
+                    ui.showToast("ফোল্ডার ডিলিট হয়েছে", "success");
+                }
             },
 
             // FEATURES
@@ -673,6 +787,15 @@
             },
 
             // RENDER
+            setFilter(f) { 
+                this.filter = f; 
+                this.render(); 
+                document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active')); 
+                event.currentTarget.classList.add('active'); 
+                
+                if(window.innerWidth < 768) ui.toggleSidebar(false);
+            },
+            
             render() {
                 let filtered = this.notes;
                 const titleEl = document.getElementById('view-title');
@@ -713,26 +836,6 @@
                     </div>`;
             },
 
-            renderFolders() {
-                document.getElementById('folder-list').innerHTML = this.folders.map(f => 
-                    `<div class="nav-item" onclick="app.setFilter('folder:${f}')">
-                        <i class="ph ph-folder"></i> <span class="nav-text">${f}</span>
-                    </div>`
-                ).join('');
-            },
-            createFolder() {
-                const name = prompt("নতুন ফোল্ডারের নাম:");
-                if(name) { this.folders.push(name); this.renderFolders(); }
-            },
-            setFilter(f) { 
-                this.filter = f; 
-                this.render(); 
-                document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active')); 
-                event.currentTarget.classList.add('active'); 
-                
-                // Auto close mobile sidebar on selection
-                if(window.innerWidth < 768) ui.toggleSidebar(false);
-            },
             search(q) {
                 const term = q.toLowerCase();
                 if(!term) { this.render(); return; }
